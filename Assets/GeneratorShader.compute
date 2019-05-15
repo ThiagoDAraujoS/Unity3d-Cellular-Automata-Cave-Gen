@@ -1,0 +1,38 @@
+﻿#pragma kernel Initialize
+#pragma kernel Iterate
+
+struct TileInfo {
+	int height;
+	int style;
+	int type;
+};
+
+struct GlobalData {
+	int length;
+};
+
+float wang_hash(uint seed)
+{
+	seed = (seed ^ 61) ^ (seed >> 16);
+	seed *= 9;
+	seed = seed ^ (seed >> 4);
+	seed *= 0x27d4eb2d;
+	seed = seed ^ (seed >> 15);
+	return (float(seed)) * (1.0 / 4294967296.0);
+}
+
+StructuredBuffer<GlobalData> globalBuffer;
+RWStructuredBuffer<TileInfo> outBuffer;
+
+
+[numthreads(8,8,1)]
+void Initialize(uint3 id : SV_DispatchThreadID)
+{
+	int index = (id.y * globalBuffer[0].length) + id.x;
+	outBuffer[index].style = id.x;
+	outBuffer[index].height = id.y;
+}
+
+[numthreads(8, 8, 1)]
+void Iterate(uint3 id : SV_DispatchThreadID) {
+}
